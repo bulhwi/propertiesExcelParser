@@ -1,47 +1,51 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParseClass {
 
-    public void parseMethod(File[] fileList){
+    public void parseMethod(File[] fileList) {
         CreateExcelFile createExcelfile = new CreateExcelFile();
         BufferedReader bf = null;
         String line = "";
         List<String> messageTagNameList = new ArrayList<>();
-        List<String> enList = new ArrayList<>();
-        List<String> tonList = new ArrayList<>();
+        Map<String, String> enMap = new HashMap<>();
+        Map<String, String> tonMap = new HashMap<>();
 
         try {
-            for(File file : fileList){
-                if(file.getName().equals("message_en_US.properties")){
+            for (File file : fileList) {
+                if (file.getName().equals("message_en_US.properties")) {
                     System.out.println("------------------------ message_en -----------------------");
                     bf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
-                    while((bf.readLine()) != null){
+                    while ((bf.readLine()) != null) {
                         line = bf.readLine();
 
-                        if(!(line.indexOf("#") == 0) && !line.equals("")){
+                        if (!(line.indexOf("#") == 0) && !line.equals("")) {
                             messageTagNameList.add(line.split("=")[0]);
-                            enList.add(line.split("=")[1]);
-                        }else if(line.indexOf("#") == 0){
+                            //enList.add(line.split("=")[1]);
+                            enMap.put(line.split("=")[0], line.split("=")[1]);
+                        } else if (line.indexOf("#") == 0) {
                             messageTagNameList.add(line);
                         }
                     }
                     System.out.println("message_en success");
-                }else{
+                } else {
                     System.out.println("------------------------ message_ton -----------------------");
                     bf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
-                    while((bf.readLine()) != null){
+                    while ((bf.readLine()) != null) {
                         line = bf.readLine();
                         String tagName = "";
 
-                        if(!(line.indexOf("#") == 0) && !line.equals("")){
+                        if (!(line.indexOf("#") == 0) && !line.equals("")) {
                             tagName = line.split("=")[0];
-                            if(messageTagNameList.contains(tagName)){
-                                tonList.add(line.split("=")[1]);
-                            }else{
+                            if (messageTagNameList.contains(tagName)) {
+                                //tonList.add(line.split("=")[1]);
+                                tonMap.put(tagName, line.split("=")[1]);
+                            } else {
                                 System.out.println("fail tagName : " + tagName);
                             }
                         }
@@ -52,7 +56,7 @@ public class ParseClass {
 
             System.out.println("list setting end");
 
-            createExcelfile.createWorkbook(messageTagNameList, enList, tonList);
+            createExcelfile.createWorkbook(messageTagNameList, enMap, tonMap);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -60,5 +64,4 @@ public class ParseClass {
             e.printStackTrace();
         }
     }
-
 }
